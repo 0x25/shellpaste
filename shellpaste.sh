@@ -1,0 +1,103 @@
+#!/bin/bash
+# date 29/03/2016
+# author 0x25
+# chmod +x <script.sh>
+
+# send file with curl directly in shell
+# need curl, openssl
+
+# -h : help
+# -s : send file (-s path/to/file)
+# -g : get file (-g token)
+
+# openssh password 
+secret="3d1tMeF0rS3kurP4ss"
+#pasteshell url:port
+server="vps260977.ovh.net"
+port="80"
+# temporary file
+tmp="/tmp/"
+tmpName="file.des3"
+# openssl encrypt parmeter
+enc="-des3" # openssl list-cipher-commands
+
+tmpFile=${tmp}${tmpName}
+sendUrl="http://${server}:${port}"
+getUrl="http://${server}:$port/p/"
+
+function sendFile {
+
+	file=$1
+	if [ -e $file ]; then
+		openssl enc $enc -salt -a -in $file -out $tmpFile -pass pass:${secret}
+		if [ -e $tmpFile ]; then
+			curl -s -X POST --data-binary @${tmpFile} $sendUrl
+			rm $tmpFile
+		else
+			echo "fail to create temporay file ..."
+			exit 2
+		fi
+	else
+		echo "no file ..."
+		exit 1
+	fi
+}
+
+
+function getFile {
+
+	value=$1
+	if [ ! -z $value ]; then
+		curl -s -o $tmpFile ${getUrl}${value}
+		if [ -e $tmpFile ]; then
+			openssl enc $enc -salt -a -d -in $tmpFile -out myFile.txt -pass pass:${secret}
+			rm $tmpFile
+		else
+			echo "no temporary file writen ..."
+			exit 4
+		fi
+	else
+		echo "empty token ..."
+		exit 3
+	fi
+}
+
+function help {
+
+	echo ""
+	echo "$0 [ -h | -s path/to/file | -g token ]"
+	echo " -s to send a file"
+	echo " -g to get a file from the token (file is write in myfile.txt)"
+	echo "file is remove after download it"
+	echo "you can use the service without the script:"
+	echo " $ curl -X POST --data-binary @/home/daniel/config.txt http://$server:$port"
+	echo " $ curl http://$server:$port/p/TOKEN > myfile.txt"
+	echo ""
+}
+
+while getopts ":s:g:h" option; do
+
+	case $option in
+	s)
+		sendFile $OPTARG
+	 	;;
+	g)
+	 	getFile $OPTARG
+	  	;;
+	h)
+	  	help
+	  	;;
+	:)
+		echo "$OPTARG need argument"
+		exit 5
+		;;
+	*|\?)
+	  	help
+		;;
+	esac
+done
+
+if [ $OPTIND -eq 1 ]; then 
+	help
+fi
+
