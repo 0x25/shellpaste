@@ -1,4 +1,4 @@
-Shellpaste is a service like pastebin but with curl an simple.  
+Shellpaste is a service like pastebin but with curl and simple.  
 beta now  
 
 # Direct connection to service
