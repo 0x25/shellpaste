@@ -4,7 +4,7 @@ beta now
 # Direct connection to service
 
 ### send file  
-curl -X POST --data-binary @/home/daniel/config.txt http://vps260977.ovh.net:80  
+curl -X POST --data-binary @/tmp/config.txt http://vps260977.ovh.net:80  
 ### get file  
 curl http://vps260977.ovh.net/p/TOKEN > file.txt
 
@@ -27,4 +27,4 @@ get the file
 file save in myfile.txt
 
 
-*thanks http://dillinger.io/ to write readme* 
+*thanks http://dillinger.io/ to format readme* 
